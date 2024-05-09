@@ -7,8 +7,16 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(TURNS.x);
+  const [board, setBoard] = useState( () =>{
+    const boardFromLocalStorage = localStorage.getItem('board')
+    return boardFromLocalStorage ? JSON.parse(boardFromLocalStorage) : Array(9).fill(null)
+  });
+  
+  const [turn, setTurn] = useState(() => {
+    const turnFromLocalStorage = localStorage.getItem('turn');
+    return turnFromLocalStorage ?? TURNS.x
+  });
+
   const [winer, setWiner] = useState(null)
 
   const updateBoard = (index) => {
@@ -19,6 +27,9 @@ function App() {
 
     const newTurn = turn === TURNS.x ? TURNS.o : TURNS.x;
     setTurn(newTurn);
+
+    window.localStorage.setItem('board', JSON.stringify(newBoard));
+    window.localStorage.setItem('turn', turn);
 
     const newWinner = checkWinnerFrom(newBoard)
     if(newWinner) {
@@ -33,6 +44,9 @@ function App() {
     setBoard(Array(9).fill(null));
     setTurn(TURNS.x);
     setWiner(null);
+
+    window.localStorage.removeItem('board');
+    window.localStorage.removeItem('turn');
   }
 
   return (
